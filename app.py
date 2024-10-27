@@ -1,50 +1,56 @@
 import streamlit as st
-import pickle
+import joblib
 import numpy as np
 
-# import the model
-pipe = pickle.load(open('pipe.pkl','rb'))
-df = pickle.load(open('df.pkl','rb'))
+# Import the model and data using joblib
+pipe = joblib.load('pipe.joblib')
+df = joblib.load('df.joblib')
 
-st.title("Laptop Predictor")
+st.title("Laptop Price Predictor")
 
-# brand
-company = st.selectbox('Brand',df['Company'].unique())
+# Brand
+company = st.selectbox('Brand', df['Company'].unique())
 
-# type of laptop
-type = st.selectbox('Type',df['TypeName'].unique())
+# Type of laptop
+type_ = st.selectbox('Type', df['TypeName'].unique())
 
-# Ram
-ram = st.selectbox('RAM(in GB)',[2,4,6,8,12,16,24,32,64])
+# RAM
+ram = st.selectbox('RAM (in GB)', [2, 4, 6, 8, 12, 16, 24, 32, 64])
 
-# weight
+# Weight
 weight = st.number_input('Weight of the Laptop')
 
 # Touchscreen
-touchscreen = st.selectbox('Touchscreen',['No','Yes'])
+touchscreen = st.selectbox('Touchscreen', ['No', 'Yes'])
 
 # IPS
-ips = st.selectbox('IPS',['No','Yes'])
+ips = st.selectbox('IPS', ['No', 'Yes'])
 
-# screen size
-screen_size = st.slider('Scrensize in inches', 10.0, 18.0, 13.0)
+# Screen size
+screen_size = st.slider('Screen size in inches', 10.0, 18.0, 13.0)
 
-# resolution
-resolution = st.selectbox('Screen Resolution',['1920x1080','1366x768','1600x900','3840x2160','3200x1800','2880x1800','2560x1600','2560x1440','2304x1440'])
+# Resolution
+resolution = st.selectbox('Screen Resolution', [
+    '1920x1080', '1366x768', '1600x900', '3840x2160',
+    '3200x1800', '2880x1800', '2560x1600', '2560x1440', '2304x1440'
+])
 
-#cpu
-cpu = st.selectbox('CPU',df['Cpu Brand'].unique())
+# CPU
+cpu = st.selectbox('CPU', df['Cpu Brand'].unique())
 
-hdd = st.selectbox('HDD(in GB)',[0,128,256,512,1024,2048])
+# HDD and SSD
+hdd = st.selectbox('HDD (in GB)', [0, 128, 256, 512, 1024, 2048])
+ssd = st.selectbox('SSD (in GB)', [0, 8, 128, 256, 512, 1024])
 
-ssd = st.selectbox('SSD(in GB)',[0,8,128,256,512,1024])
+# GPU
+gpu = st.selectbox('GPU', df['Gpu Brand'].unique())
 
-gpu = st.selectbox('GPU',df['Gpu Brand'].unique())
+# OS
+os = st.selectbox('OS', df['os'].unique())
 
-os = st.selectbox('OS',df['os'].unique())
-
+# Prediction button
 if st.button('Predict Price'):
-    # query
+    # Query
     ppi = None
     if touchscreen == 'Yes':
         touchscreen = 1
@@ -58,9 +64,12 @@ if st.button('Predict Price'):
 
     X_res = int(resolution.split('x')[0])
     Y_res = int(resolution.split('x')[1])
-    ppi = ((X_res**2) + (Y_res**2))**0.5/screen_size
-    query = np.array([company,type,ram,weight,touchscreen,ips,ppi,cpu,hdd,ssd,gpu,os])
+    ppi = ((X_res**2) + (Y_res**2))**0.5 / screen_size
+    query = np.array([company, type_, ram, weight, touchscreen, ips, ppi, cpu, hdd, ssd, gpu, os])
 
-    query = query.reshape(1,12)
-    st.title("The predicted price of this configuration is " + str(int(np.exp(pipe.predict(query)[0]))))
-
+    query = query.reshape(1, -1)
+    try:
+        predicted_price = int(np.exp(pipe.predict(query)[0]))
+        st.title(f"The predicted price of this configuration is ${predicted_price}")
+    except Exception as e:
+        st.error(f"Error in prediction: {e}")
