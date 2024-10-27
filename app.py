@@ -6,8 +6,7 @@ import numpy as np
 with open('pipe.pkl', 'rb') as f:
     pipe = pickle.load(f)
 
-with open('df.pkl', 'rb') as f:
-    df = pickle.load(f)
+df = pd.read_pickle('your_file.pkl')
 
 st.title('Laptop Price Predictor')
 
