@@ -33,13 +33,13 @@ screen_size = st.slider('Scrensize in inches', 10.0, 18.0, 13.0)
 resolution = st.selectbox('Screen Resolution',['1920x1080','1366x768','1600x900','3840x2160','3200x1800','2880x1800','2560x1600','2560x1440','2304x1440'])
 
 #cpu
-cpu = st.selectbox('CPU',df['Cpu brand'].unique())
+cpu = st.selectbox('CPU',df['Cpu Brand'].unique())
 
 hdd = st.selectbox('HDD(in GB)',[0,128,256,512,1024,2048])
 
 ssd = st.selectbox('SSD(in GB)',[0,8,128,256,512,1024])
 
-gpu = st.selectbox('GPU',df['Gpu brand'].unique())
+gpu = st.selectbox('GPU',df['Gpu Brand'].unique())
 
 os = st.selectbox('OS',df['os'].unique())
 
